@@ -19,28 +19,58 @@ function App() {
   if (auth.error) {
     return (
       <div>
-        Oops... {auth.error.kind} caused {auth.error.message}
+        Oops... {auth.error.kind}. Caused by "{auth.error.message}".
       </div>
     );
   }
 
+  let decodedToken = null;
+  if (auth.user?.access_token) {
+    try {
+      decodedToken = decodeJwt(auth.user.access_token);
+      console.log('Decoded Access Token:', decodedToken);
+    } catch (error) {
+      console.error('Failed to decode access token:', error);
+    }
+  }
+
   return (
     <>
-      <h1>Test Login</h1>
       <div className="card">
         {!auth.isAuthenticated && (
-          <button onClick={auth.signinRedirect} disabled={auth.isLoading}>
-            Log In
-          </button>
+          <>
+            <h1>Welcome to the React OIDC client example!</h1>
+            <p>
+              Please configure your OIDC settings in{' '}
+              <code>src/oidc.config.js</code> and log in.
+            </p>
+            <br />
+            <br />
+            <button onClick={auth.signinRedirect} disabled={auth.isLoading}>
+              Log In
+            </button>
+          </>
         )}
-        <p>{auth.user?.profile.email}</p>
-        {auth.user?.access_token && (
+
+        <h2>{auth.user?.profile.email}</h2>
+
+        {auth.isAuthenticated && !decodedToken && (
+          <>
+            <p>
+              You have successfully authenticated, but the token could not be
+              parsed. Set allowed API in the Application settings to make the
+              token parseable.
+            </p>
+          </>
+        )}
+
+        {decodedToken && (
           <pre className="text-left">
-            {JSON.stringify(decodeJwt(auth.user?.access_token), null, 2)}
+            {JSON.stringify(decodedToken, null, 2)}
           </pre>
         )}
         {auth.isAuthenticated && (
-          <button onClick={auth.signoutSilent}>Log Out</button>
+          <button onClick={auth.signoutRedirect}>Log Out</button>
         )}
       </div>
     </>
