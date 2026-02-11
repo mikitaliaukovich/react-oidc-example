@@ -4,7 +4,7 @@ This project is a simple demo application for testing integration with OIDC prov
 
 ## Configuration
 
-All OIDC settings must be applied in [src/main.jsx](src/oidc.config.js). Update the `oidcConfig` values there to match your provider (authority, client ID, redirect URI, scopes, and any extra query parameters).
+All OIDC settings must be applied in [src/oidc.config.js](src/oidc.config.js). Update the `oidcConfig` values there to match your provider (authority, client ID, redirect URI, scopes, and any extra query parameters).
 
 ## Run locally
 
@@ -14,4 +14,5 @@ All OIDC settings must be applied in [src/main.jsx](src/oidc.config.js). Update 
    - npm run dev
 
 The app will be available at http://localhost:8080.
+
 
