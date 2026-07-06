@@ -9,13 +9,12 @@ export const oidcConfig = {
 
   // Set Client Secret to Application Secret
   // !(for testing only, do not use ClientSecret auth in frontend apps)
-  client_secret:
-    'shpEVZOw4gueAj5vhP1tk_HOKP_xxxxxxxxxxxxxxx_TOF0VfWQSb_S21jS7Gpd4',
+  client_secret: 'shpEVZOw4gueAj5vhP1tk_HOKP_xxxxxxxxxxxxxxx_TOF0VfWQSb_S21jS7Gpd4',
 
   // Set Redirect URI to your application's redirect URI
-  redirect_uri: 'http://localhost:8080',
+  redirect_uri: window.location.origin,
   // Set Allowed Logount URI to your application's settings
-  post_logout_redirect_uri: 'http://localhost:8080',
+  post_logout_redirect_uri: window.location.origin,
 
   response_type: 'code',
   // Scope can be edited
@@ -34,12 +33,12 @@ export const oidcConfig = {
 
   onSigninCallback: () => {
     // Remove the auth params from the URL after successful login
-    window.history.replaceState({}, document.title, 'http://localhost:8080/');
+    window.history.replaceState({}, document.title, window.location.origin);
   },
 
   onerror: (error) => {
     // Handle errors during authentication
     console.error('Authentication error:', error);
-    window.history.replaceState({}, document.title, 'http://localhost:8080/');
+    window.history.replaceState({}, document.title, window.location.origin);
   },
 };

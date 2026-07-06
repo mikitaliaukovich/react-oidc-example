@@ -41,8 +41,7 @@ function App() {
           <>
             <h1>Welcome to the React OIDC client example!</h1>
             <p>
-              Please configure your OIDC settings in{' '}
-              <code>src/oidc.config.js</code> and log in.
+              Please configure your OIDC settings using the <code>Edit Settings</code> button above and log in.
             </p>
             <br />
             <br />
@@ -57,21 +56,17 @@ function App() {
         {auth.isAuthenticated && !decodedToken && (
           <>
             <p>
-              You have successfully authenticated, but the token could not be
-              parsed. Set allowed API in the Application settings to make the
-              token parseable.
+              You have successfully authenticated, but the access token could not be parsed. Set allowed API in the application settings to
+              make the token parseable.
             </p>
+            <p>ID token is available below:</p>
+
+            <pre className="pre-block">{auth.user?.id_token}</pre>
           </>
         )}
 
-        {decodedToken && (
-          <pre className="text-left">
-            {JSON.stringify(decodedToken, null, 2)}
-          </pre>
-        )}
-        {auth.isAuthenticated && (
-          <button onClick={auth.signoutRedirect}>Log Out</button>
-        )}
+        {decodedToken && <pre className="text-left">{JSON.stringify(decodedToken, null, 2)}</pre>}
+        {auth.isAuthenticated && <button onClick={auth.signoutRedirect}>Log Out</button>}
       </div>
     </>
   );
