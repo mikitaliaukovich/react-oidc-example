@@ -2,9 +2,10 @@
 
 This project is a simple demo application for testing integration with OIDC providers using `oidc-client-ts` and `react-oidc-context` libraries.
 
-## Configuration
+## Use deployed app
+https://mikitaliaukovich.github.io/react-oidc-example/
 
-All OIDC settings must be applied in [src/oidc.config.js](src/oidc.config.js). Update the `oidcConfig` values there to match your provider (authority, client ID, redirect URI, scopes, and any extra query parameters).
+Configure settings through UI and test your login flow
 
 ## Run locally
 
