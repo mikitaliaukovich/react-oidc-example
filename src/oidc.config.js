@@ -12,9 +12,9 @@ export const oidcConfig = {
   client_secret: 'shpEVZOw4gueAj5vhP1tk_HOKP_xxxxxxxxxxxxxxx_TOF0VfWQSb_S21jS7Gpd4',
 
   // Set Redirect URI to your application's redirect URI
-  redirect_uri: window.location.origin,
+  redirect_uri: window.location.origin + import.meta.env.BASE_URL,
   // Set Allowed Logount URI to your application's settings
-  post_logout_redirect_uri: window.location.origin,
+  post_logout_redirect_uri: window.location.origin + import.meta.env.BASE_URL,
 
   response_type: 'code',
   // Scope can be edited
@@ -33,12 +33,12 @@ export const oidcConfig = {
 
   onSigninCallback: () => {
     // Remove the auth params from the URL after successful login
-    window.history.replaceState({}, document.title, window.location.origin);
+    window.history.replaceState({}, document.title, window.location.origin + import.meta.env.BASE_URL);
   },
 
   onerror: (error) => {
     // Handle errors during authentication
     console.error('Authentication error:', error);
-    window.history.replaceState({}, document.title, window.location.origin);
+    window.history.replaceState({}, document.title, window.location.origin + import.meta.env.BASE_URL);
   },
 };
