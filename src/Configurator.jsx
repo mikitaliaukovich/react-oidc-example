@@ -2,12 +2,13 @@ import { useState } from 'react';
 import { AuthProvider } from 'react-oidc-context';
 import './App.css';
 import App from './App.jsx';
-import { useOidcSettings } from './useOidcSettings.js';
+import { AUTH_METHODS, useOidcSettings } from './useOidcSettings.js';
 
 const FORM_FIELDS = [
   { key: 'authority', label: 'Authority', required: true },
   { key: 'client_id', label: 'Client ID', required: true },
   { key: 'client_secret', label: 'Client Secret', secret: true },
+  { key: 'client_auth_method', label: 'Client Authentication Method', options: AUTH_METHODS },
   { key: 'scope', label: 'Scope' },
   { key: 'audience', label: 'Audience' },
   { key: 'tenantId', label: 'Tenant ID' },
@@ -63,20 +64,35 @@ function Configurator() {
           handleProceed();
         }}
       >
-        {FORM_FIELDS.map(({ key, label, required, secret }) => (
+        {FORM_FIELDS.map(({ key, label, required, secret, options }) => (
           <div key={key} style={{ marginBottom: '0.75rem' }}>
             <label htmlFor={key}>
               {label}
               {required ? ' *' : ''}
             </label>
             <br />
-            <input
-              id={key}
-              type={secret && !showSecret ? 'password' : 'text'}
-              value={settings[key] ?? ''}
-              onChange={(e) => setField(key, e.target.value)}
-              style={{ width: '100%' }}
-            />
+            {options ? (
+              <select
+                id={key}
+                value={settings[key] ?? options[0].value}
+                onChange={(e) => setField(key, e.target.value)}
+                style={{ width: '100%' }}
+              >
+                {options.map(({ value, label: optionLabel }) => (
+                  <option key={value} value={value}>
+                    {optionLabel}
+                  </option>
+                ))}
+              </select>
+            ) : (
+              <input
+                id={key}
+                type={secret && !showSecret ? 'password' : 'text'}
+                value={settings[key] ?? ''}
+                onChange={(e) => setField(key, e.target.value)}
+                style={{ width: '100%' }}
+              />
+            )}
             {secret && (
               <button
                 type="button"
