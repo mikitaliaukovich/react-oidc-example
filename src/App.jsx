@@ -19,7 +19,9 @@ function App() {
   if (auth.error) {
     return (
       <div>
-        Oops... {auth.error.kind}. Caused by "{auth.error.message}".
+        <p>Oops... Error caused by "{auth.error.message}".</p>
+        <p>Try logging out using the button below.</p>
+        <button onClick={auth.signoutRedirect}>Log Out</button>
       </div>
     );
   }
