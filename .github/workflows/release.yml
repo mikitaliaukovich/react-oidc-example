@@ -30,6 +30,8 @@ jobs:
         run: |
           npm run lint
           npm test
+          npm run build
+          npm run test:electron
 
       - name: Set version from tag
         run: npm version "${GITHUB_REF_NAME#v}" --no-git-tag-version

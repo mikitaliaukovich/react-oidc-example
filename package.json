@@ -13,7 +13,8 @@
     "dist": "vite build && electron-builder --win --x64",
     "lint": "eslint .",
     "preview": "vite preview",
-    "test": "vitest run"
+    "test": "vitest run",
+    "test:electron": "electron electron/protocol.e2e.js"
   },
   "devDependencies": {
     "@eslint/js": "^9.25.0",
@@ -41,6 +42,7 @@
       "dist/**",
       "electron/**",
       "!electron/**/*.test.js",
+      "!electron/**/*.e2e.js",
       "package.json"
     ],
     "directories": {

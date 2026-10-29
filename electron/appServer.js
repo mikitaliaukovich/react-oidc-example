@@ -64,12 +64,10 @@ export function resolveAppFile(distDir, url) {
 }
 
 // Answers app URLs from distDir inside the given session instead of opening a
-// real port. Every other http request goes out unchanged.
-export function registerAppProtocol(ses, distDir) {
+// real port. Every other http request is handed to `forward`.
+export function registerAppProtocol(ses, distDir, forward) {
   ses.protocol.handle('http', async (request) => {
-    if (!isAppUrl(request.url)) {
-      return ses.fetch(request, { bypassCustomProtocolHandlers: true });
-    }
+    if (!isAppUrl(request.url)) return forward(request);
 
     const filePath = resolveAppFile(distDir, request.url);
     if (!filePath) return new Response('Not found', { status: 404 });

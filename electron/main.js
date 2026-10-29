@@ -2,6 +2,7 @@ import { app, BrowserWindow, ipcMain, safeStorage, session, shell } from 'electr
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { APP_URL, isAppUrl, registerAppProtocol } from './appServer.js';
+import { forwardWithoutFollowingRedirects } from './passThrough.js';
 import { createSettingsStore } from './settingsStore.js';
 
 const electronDir = path.dirname(fileURLToPath(import.meta.url));
@@ -46,7 +47,7 @@ function createWindow(ses) {
 app.whenReady().then(() => {
   // No `persist:` prefix: storage, cookies and cache live only in memory.
   const ses = session.fromPartition('oidc-test-client');
-  registerAppProtocol(ses, distDir);
+  registerAppProtocol(ses, distDir, (request) => forwardWithoutFollowingRedirects(ses, request));
   ses.setPermissionRequestHandler((_webContents, _permission, callback) => callback(false));
   ses.setPermissionCheckHandler(() => false);
 
