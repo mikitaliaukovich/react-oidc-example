@@ -60,13 +60,11 @@
             "x64"
           ]
         }
-      ]
+      ],
+      "artifactName": "OIDC-Test-Client-${version}-win-${arch}.${ext}"
     },
     "portable": {
       "artifactName": "OIDC-Test-Client-${version}-portable.${ext}"
-    },
-    "zip": {
-      "artifactName": "OIDC-Test-Client-${version}-win-x64.${ext}"
     }
   }
 }
