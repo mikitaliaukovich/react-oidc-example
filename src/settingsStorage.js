@@ -18,10 +18,23 @@ export function loadStoredSettings() {
   }
 }
 
-export async function saveStoredSettings(settings) {
-  const bridge = desktopBridge();
-  if (bridge) return bridge.save(settings);
+// False when the desktop app can't encrypt (no DPAPI), so it won't keep the
+// client secret across restarts.
+export function canSaveSecret() {
+  return desktopBridge()?.encryptionAvailable ?? true;
+}
 
-  localStorage.setItem(STORAGE_KEY, JSON.stringify(settings));
-  return { secretSaved: true };
+export async function saveStoredSettings(settings) {
+  try {
+    const bridge = desktopBridge();
+    if (bridge) {
+      const { secretSaved } = await bridge.save(settings);
+      return { saved: true, secretSaved };
+    }
+
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(settings));
+    return { saved: true, secretSaved: true };
+  } catch {
+    return { saved: false, secretSaved: false };
+  }
 }

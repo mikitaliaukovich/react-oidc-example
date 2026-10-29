@@ -1,5 +1,6 @@
 {
   "name": "my-demo-app",
+  "productName": "OIDC Test Client",
   "private": true,
   "version": "0.0.0",
   "description": "Desktop client for testing OIDC login flows",

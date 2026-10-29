@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { oidcConfig } from './oidc.config.js';
-import { loadStoredSettings, saveStoredSettings } from './settingsStorage.js';
+import { canSaveSecret, loadStoredSettings, saveStoredSettings } from './settingsStorage.js';
 
 // Client authentication methods selectable in the UI. `none` leaves the auth
 // config untouched (public client), the others set `client_authentication` so
@@ -28,12 +28,13 @@ function loadInitialSettings() {
 
 export function useOidcSettings() {
   const [settings, setSettings] = useState(loadInitialSettings);
-  const [secretNotSaved, setSecretNotSaved] = useState(false);
+  const [saveFailed, setSaveFailed] = useState(false);
+  const secretNotSaved = !canSaveSecret();
 
   function setField(field, value) {
     const next = { ...settings, [field]: value };
     setSettings(next);
-    saveStoredSettings(next).then(({ secretSaved }) => setSecretNotSaved(!secretSaved));
+    saveStoredSettings(next).then(({ saved }) => setSaveFailed(!saved));
   }
 
   function buildAuthProviderConfig() {
@@ -52,5 +53,5 @@ export function useOidcSettings() {
     };
   }
 
-  return { settings, setField, secretNotSaved, buildAuthProviderConfig };
+  return { settings, setField, secretNotSaved, saveFailed, buildAuthProviderConfig };
 }

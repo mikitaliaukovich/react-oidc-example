@@ -30,7 +30,7 @@ The desktop app doesn't open a network port. It serves itself at that address in
 
 ## Run from source
 
-Requires Node.js 20 or later.
+Requires Node.js 22.12 or later.
 
 1. Install dependencies:
    - `npm ci`
@@ -56,4 +56,11 @@ git push origin v1.0.0
 
 The `Release desktop app` workflow builds both files on Windows and attaches them to a GitHub Release for that tag.
 
-Publish the first release before the placeholder goes live on GitHub Pages. The placeholder deploys on every push to `main`, and its download link points at the latest release.
+### First rollout
+
+Every push to `main` deploys the placeholder to GitHub Pages, and the placeholder's download link points at the latest release. So publish a release before the placeholder goes live:
+
+1. Push the feature branch (not `main`).
+2. Tag the branch head, e.g. `v1.0.0`, and push the tag.
+3. Wait for the `Release desktop app` workflow to publish the release.
+4. Merge the branch into `main`, which deploys the placeholder.

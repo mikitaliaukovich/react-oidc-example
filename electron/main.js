@@ -59,7 +59,9 @@ app.whenReady().then(() => {
   // IdP pages load in the same window, so only the app's own frames may read
   // or write the settings.
   ipcMain.on('settings:load', (event) => {
-    event.returnValue = isAppUrl(event.senderFrame?.url) ? store.load() : null;
+    event.returnValue = isAppUrl(event.senderFrame?.url)
+      ? { settings: store.load(), encryptionAvailable: store.encryptionAvailable() }
+      : null;
   });
 
   ipcMain.handle('settings:save', (event, settings) => {
