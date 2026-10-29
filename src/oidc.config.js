@@ -9,7 +9,7 @@ export const oidcConfig = {
 
   // Set Client Secret to Application Secret
   // !(for testing only, do not use ClientSecret auth in frontend apps)
-  client_secret: 'shpEVZOw4gueAj5vhP1tk_HOKP_xxxxxxxxxxxxxxx_TOF0VfWQSb_S21jS7Gpd4',
+  client_secret: '',
 
   // Set Redirect URI to your application's redirect URI
   redirect_uri: window.location.origin + import.meta.env.BASE_URL,
@@ -28,17 +28,11 @@ export const oidcConfig = {
     // tenantId: '',
   },
 
-  // Using localStorage to persist the session
-  userStore: new WebStorageStateStore({ store: window.localStorage }),
+  // Using sessionStorage so the session ends when the window closes
+  userStore: new WebStorageStateStore({ store: window.sessionStorage }),
 
   onSigninCallback: () => {
     // Remove the auth params from the URL after successful login
-    window.history.replaceState({}, document.title, window.location.origin + import.meta.env.BASE_URL);
-  },
-
-  onerror: (error) => {
-    // Handle errors during authentication
-    console.error('Authentication error:', error);
     window.history.replaceState({}, document.title, window.location.origin + import.meta.env.BASE_URL);
   },
 };

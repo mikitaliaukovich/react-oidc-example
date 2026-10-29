@@ -23,7 +23,7 @@ function hasAuthResponseInUrl() {
 }
 
 function Configurator() {
-  const { settings, setField, buildAuthProviderConfig } = useOidcSettings();
+  const { settings, setField, secretNotSaved, buildAuthProviderConfig } = useOidcSettings();
   const [started, setStarted] = useState(hasAuthResponseInUrl);
   const [showSecret, setShowSecret] = useState(false);
   const [showValidation, setShowValidation] = useState(false);
@@ -100,6 +100,12 @@ function Configurator() {
               >
                 {showSecret ? 'Hide' : 'Show'}
               </button>
+            )}
+            {secret && secretNotSaved && (
+              <p>
+                Encryption isn't available on this machine, so the client secret is not saved and must be re-entered
+                after a restart.
+              </p>
             )}
           </div>
         ))}
