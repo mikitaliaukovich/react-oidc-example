@@ -1,7 +1,6 @@
 import { useState } from 'react';
 import { oidcConfig } from './oidc.config.js';
-
-const STORAGE_KEY = 'oidc-settings-overrides';
+import { canSaveSecret, loadStoredSettings, saveStoredSettings } from './settingsStorage.js';
 
 // Client authentication methods selectable in the UI. `none` leaves the auth
 // config untouched (public client), the others set `client_authentication` so
@@ -23,23 +22,19 @@ function loadInitialSettings() {
     tenantId: oidcConfig.extraQueryParams?.tenantId ?? '',
   };
 
-  try {
-    const stored = JSON.parse(localStorage.getItem(STORAGE_KEY));
-    return stored ? { ...defaults, ...stored } : defaults;
-  } catch {
-    return defaults;
-  }
+  const stored = loadStoredSettings();
+  return stored ? { ...defaults, ...stored } : defaults;
 }
 
 export function useOidcSettings() {
   const [settings, setSettings] = useState(loadInitialSettings);
+  const [saveFailed, setSaveFailed] = useState(false);
+  const secretNotSaved = !canSaveSecret();
 
   function setField(field, value) {
-    setSettings((prev) => {
-      const next = { ...prev, [field]: value };
-      localStorage.setItem(STORAGE_KEY, JSON.stringify(next));
-      return next;
-    });
+    const next = { ...settings, [field]: value };
+    setSettings(next);
+    saveStoredSettings(next).then(({ saved }) => setSaveFailed(!saved));
   }
 
   function buildAuthProviderConfig() {
@@ -58,5 +53,5 @@ export function useOidcSettings() {
     };
   }
 
-  return { settings, setField, buildAuthProviderConfig };
+  return { settings, setField, secretNotSaved, saveFailed, buildAuthProviderConfig };
 }

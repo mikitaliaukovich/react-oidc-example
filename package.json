@@ -1,30 +1,73 @@
 {
   "name": "my-demo-app",
+  "productName": "OIDC Test Client",
   "private": true,
   "version": "0.0.0",
+  "description": "Desktop client for testing OIDC login flows",
+  "author": "Mikita Liaukovich",
   "type": "module",
+  "main": "electron/main.js",
   "scripts": {
     "dev": "vite",
     "build": "vite build",
+    "start": "vite build && electron .",
+    "dist": "vite build && electron-builder --win --x64",
     "lint": "eslint .",
-    "preview": "vite preview"
-  },
-  "dependencies": {
-    "jose": "^6.0.11",
-    "oidc-client-ts": "^3.2.1",
-    "react": "^19.1.0",
-    "react-dom": "^19.1.0",
-    "react-oidc-context": "^3.3.0"
+    "preview": "vite preview",
+    "test": "vitest run",
+    "test:electron": "electron electron/protocol.e2e.js"
   },
   "devDependencies": {
     "@eslint/js": "^9.25.0",
     "@types/react": "^19.1.2",
     "@types/react-dom": "^19.1.2",
     "@vitejs/plugin-react": "^4.4.1",
+    "electron": "^45.1.0",
+    "electron-builder": "^26.18.0",
     "eslint": "^9.25.0",
     "eslint-plugin-react-hooks": "^5.2.0",
     "eslint-plugin-react-refresh": "^0.4.19",
     "globals": "^16.0.0",
-    "vite": "^6.3.5"
+    "jose": "^6.0.11",
+    "oidc-client-ts": "^3.2.1",
+    "react": "^19.1.0",
+    "react-dom": "^19.1.0",
+    "react-oidc-context": "^3.3.0",
+    "vite": "^6.3.5",
+    "vitest": "^5.0.5"
+  },
+  "build": {
+    "appId": "com.mikitaliaukovich.oidc-test-client",
+    "productName": "OIDC Test Client",
+    "files": [
+      "dist/**",
+      "electron/**",
+      "!electron/**/*.test.js",
+      "!electron/**/*.e2e.js",
+      "package.json"
+    ],
+    "directories": {
+      "output": "release"
+    },
+    "win": {
+      "target": [
+        {
+          "target": "portable",
+          "arch": [
+            "x64"
+          ]
+        },
+        {
+          "target": "zip",
+          "arch": [
+            "x64"
+          ]
+        }
+      ],
+      "artifactName": "OIDC-Test-Client-${version}-win-${arch}.${ext}"
+    },
+    "portable": {
+      "artifactName": "OIDC-Test-Client-${version}-portable.${ext}"
+    }
   }
 }

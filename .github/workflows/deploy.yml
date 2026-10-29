@@ -1,4 +1,4 @@
-name: Deploy to GitHub Pages
+name: Deploy placeholder to GitHub Pages
 
 on:
   push:
@@ -21,17 +21,13 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Setup Node
-        uses: actions/setup-node@v4
-        with:
-          node-version: 20
-          cache: npm
-
-      - name: Install dependencies
-        run: npm ci
-
-      - name: Build
-        run: npm run build
+      # The app itself now ships as a desktop app (see release.yml). Pages only
+      # serves a static placeholder that removes the old app's browser data.
+      - name: Prepare placeholder site
+        run: |
+          mkdir site
+          cp pages/index.html pages/cleanup.js site/
+          cp pages/index.html site/404.html
 
       - name: Setup Pages
         uses: actions/configure-pages@v5
@@ -39,7 +35,7 @@ jobs:
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
         with:
-          path: dist
+          path: site
 
   deploy:
     needs: build
@@ -48,6 +44,6 @@ jobs:
       name: github-pages
       url: ${{ steps.deployment.outputs.page_url }}
     steps:
-      - name: Deploy to GitHub Pages
+      - name: Deploy placeholder to GitHub Pages
         id: deployment
         uses: actions/deploy-pages@v4

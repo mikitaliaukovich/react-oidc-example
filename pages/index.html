@@ -1,0 +1,150 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="referrer" content="no-referrer" />
+    <title>OIDC Test Client has moved</title>
+    <style>
+      :root {
+        font-family: system-ui, Avenir, Helvetica, Arial, sans-serif;
+        line-height: 1.5;
+        color-scheme: light dark;
+        color: rgba(255, 255, 255, 0.87);
+        background-color: #242424;
+      }
+      body {
+        margin: 0;
+        display: flex;
+        justify-content: center;
+        min-height: 100vh;
+      }
+      main {
+        max-width: 720px;
+        padding: 2rem;
+      }
+      h1 {
+        font-size: 2.4em;
+        line-height: 1.1;
+      }
+      a {
+        font-weight: 500;
+        color: #646cff;
+      }
+      .button {
+        display: inline-block;
+        border-radius: 8px;
+        padding: 0.6em 1.2em;
+        background-color: #1a1a1a;
+        border: 1px solid #646cff;
+        text-decoration: none;
+      }
+      pre,
+      code {
+        background-color: #1a1a1a;
+        border-radius: 6px;
+      }
+      code {
+        padding: 0.1em 0.35em;
+      }
+      pre {
+        padding: 1em;
+        overflow-x: auto;
+      }
+      pre code {
+        padding: 0;
+      }
+      .status {
+        border-left: 4px solid #646cff;
+        padding: 0.5em 1em;
+      }
+      @media (prefers-color-scheme: light) {
+        :root {
+          color: #213547;
+          background-color: #ffffff;
+        }
+        .button,
+        pre,
+        code {
+          background-color: #f4f4f4;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <main>
+      <h1>OIDC Test Client has moved to a desktop app</h1>
+      <p>
+        To keep client secrets and tokens out of the browser, the app no longer runs on this website. It now runs as a
+        standalone Windows app. You'll need to enter your OIDC settings once in the new app.
+      </p>
+
+      <p class="status" id="cleanup-status">Checking this browser for data saved by the old app…</p>
+      <noscript>
+        <p class="status">
+          JavaScript is off, so data saved by the old app wasn't removed. Clear this site's data in your browser
+          settings.
+        </p>
+      </noscript>
+
+      <h2>Download</h2>
+      <p>
+        <a class="button" href="https://github.com/mikitaliaukovich/react-oidc-example/releases/latest">
+          Download from GitHub Releases
+        </a>
+      </p>
+      <ul>
+        <li>
+          <strong><code>OIDC-Test-Client-…-win-x64.zip</code></strong>: extract it to any folder and run
+          <code>OIDC Test Client.exe</code>. Use this one if your company blocks the portable <code>.exe</code>.
+        </li>
+        <li>
+          <strong><code>OIDC-Test-Client-…-portable.exe</code></strong>: a single file with nothing to install. It
+          unpacks itself on every start, so it opens more slowly.
+        </li>
+      </ul>
+      <p>
+        The app isn't code-signed yet. If Windows SmartScreen warns you, choose <em>More info</em> →
+        <em>Run anyway</em>.
+      </p>
+
+      <h2>Or run it from source</h2>
+      <p>With Node.js 22.12 or later and Git installed:</p>
+      <pre><code>git clone https://github.com/mikitaliaukovich/react-oidc-example.git
+cd react-oidc-example
+npm ci
+npm start</code></pre>
+
+      <h2>Update your IdP application</h2>
+      <p>Register this URL as both the redirect URI and the post-logout redirect URI:</p>
+      <pre><code>http://localhost:8080/react-oidc-example/</code></pre>
+      <p>
+        The desktop app doesn't open a network port. It only uses this address inside its own window, so other
+        programs on your machine can't reach it.
+      </p>
+    </main>
+
+    <script type="module">
+      import { removeOldAppData } from '/react-oidc-example/cleanup.js';
+
+      const status = document.getElementById('cleanup-status');
+      try {
+        const removed = removeOldAppData({
+          storages: [window.localStorage, window.sessionStorage],
+          getCookies: () => document.cookie,
+          setCookie: (cookie) => {
+            document.cookie = cookie;
+          },
+        });
+        status.textContent =
+          removed > 0
+            ? `Removed ${removed} item${removed === 1 ? '' : 's'} the old app had saved in this browser, including any saved client secret and sign-in tokens.`
+            : 'No data from the old app was found in this browser.';
+      } catch (error) {
+        status.textContent = `Couldn't remove the old app's data (${error.message}). Clear this site's data in your browser settings.`;
+      }
+      // Drop any ?code=… or #… left over from an old sign-in redirect.
+      if (location.search || location.hash) history.replaceState(null, '', location.pathname);
+    </script>
+  </body>
+</html>

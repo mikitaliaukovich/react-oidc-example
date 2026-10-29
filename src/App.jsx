@@ -1,9 +1,19 @@
+import { useEffect } from 'react';
 import { useAuth } from 'react-oidc-context';
 import './App.css';
 import { decodeJwt } from 'jose';
 
 function App() {
   const auth = useAuth();
+
+  // onSigninCallback only runs on success. After a failed sign-in the IdP
+  // response stays in the URL, and the next AuthProvider mount (e.g. after
+  // editing settings) would process it again, so remove it here.
+  useEffect(() => {
+    if (auth.error) {
+      window.history.replaceState({}, document.title, window.location.origin + import.meta.env.BASE_URL);
+    }
+  }, [auth.error]);
 
   switch (auth.activeNavigator) {
     case 'signinSilent':
@@ -21,7 +31,7 @@ function App() {
       <div>
         <p>Oops... Error caused by "{auth.error.message}".</p>
         <p>Try logging out using the button below.</p>
-        <button onClick={auth.signoutRedirect}>Log Out</button>
+        <button onClick={() => auth.signoutRedirect()}>Log Out</button>
       </div>
     );
   }
@@ -47,7 +57,7 @@ function App() {
             </p>
             <br />
             <br />
-            <button onClick={auth.signinRedirect} disabled={auth.isLoading}>
+            <button onClick={() => auth.signinRedirect()} disabled={auth.isLoading}>
               Log In
             </button>
           </>
@@ -68,7 +78,7 @@ function App() {
         )}
 
         {decodedToken && <pre className="text-left">{JSON.stringify(decodedToken, null, 2)}</pre>}
-        {auth.isAuthenticated && <button onClick={auth.signoutRedirect}>Log Out</button>}
+        {auth.isAuthenticated && <button onClick={() => auth.signoutRedirect()}>Log Out</button>}
       </div>
     </>
   );
