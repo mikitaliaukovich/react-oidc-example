@@ -1,6 +1,6 @@
 import path from 'node:path';
 import { describe, expect, it } from 'vitest';
-import { APP_URL, isAppUrl, resolveAppFile } from './appServer.js';
+import { APP_URL, CONTENT_SECURITY_POLICY, isAppUrl, resolveAppFile } from './appServer.js';
 
 const distDir = path.resolve('/app/dist');
 
@@ -41,5 +41,22 @@ describe('isAppUrl', () => {
   it('rejects values that are not URLs', () => {
     expect(isAppUrl('')).toBe(false);
     expect(isAppUrl(undefined)).toBe(false);
+  });
+});
+
+describe('CONTENT_SECURITY_POLICY', () => {
+  const directives = Object.fromEntries(
+    CONTENT_SECURITY_POLICY.split(';').map((directive) => {
+      const [name, ...values] = directive.trim().split(/\s+/);
+      return [name, values];
+    }),
+  );
+
+  it("lets silent renew frame the user-supplied IdP's authorize page", () => {
+    expect(directives['frame-src']).toEqual(expect.arrayContaining(["'self'", 'http:', 'https:']));
+  });
+
+  it('only lets the app frame itself', () => {
+    expect(directives['frame-ancestors']).toEqual(["'self'"]);
   });
 });

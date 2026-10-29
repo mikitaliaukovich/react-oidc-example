@@ -8,13 +8,15 @@ export const APP_BASE = '/react-oidc-example/';
 export const APP_URL = APP_ORIGIN + APP_BASE;
 
 // The authority is user-supplied, so OIDC discovery and token calls may go to
-// any host. Scripts, styles and frames stay limited to the app itself.
+// any host, and silent renew frames the IdP's authorize page. Scripts and
+// styles stay limited to the app itself.
 export const CONTENT_SECURITY_POLICY = [
   "default-src 'self'",
   "script-src 'self'",
   "style-src 'self'",
   "img-src 'self' data:",
-  "frame-src 'self'",
+  "frame-src 'self' http: https:",
+  "frame-ancestors 'self'",
   'connect-src *',
   "object-src 'none'",
   "base-uri 'self'",
