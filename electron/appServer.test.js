@@ -1,6 +1,6 @@
 import path from 'node:path';
 import { describe, expect, it } from 'vitest';
-import { APP_URL, CONTENT_SECURITY_POLICY, isAppUrl, resolveAppFile } from './appServer.js';
+import { APP_URL, CONTENT_SECURITY_POLICY, isAppUrl, keepRedirectsToAppInside, resolveAppFile } from './appServer.js';
 
 const distDir = path.resolve('/app/dist');
 
@@ -58,5 +58,41 @@ describe('CONTENT_SECURITY_POLICY', () => {
 
   it('only lets the app frame itself', () => {
     expect(directives['frame-ancestors']).toEqual(["'self'"]);
+  });
+});
+
+describe('keepRedirectsToAppInside', () => {
+  const callback = `${APP_URL}?code=abc&state=xyz`;
+  const fromIdp = new Request('https://idp.example/authorize');
+
+  function redirect(location, headers = {}) {
+    return new Response(null, { status: 302, headers: { Location: location, ...headers } });
+  }
+
+  it('turns an https redirect to the app into a page that navigates there', async () => {
+    const response = await keepRedirectsToAppInside(fromIdp, redirect(callback, { 'Set-Cookie': 'sid=1' }));
+
+    expect(response.status).toBe(200);
+    expect(response.headers.get('location')).toBeNull();
+    expect(response.headers.get('set-cookie')).toBe('sid=1');
+    expect(await response.text()).toContain(`content="0;url=${APP_URL}?code=abc&#38;state=xyz"`);
+  });
+
+  it('leaves redirects elsewhere alone', async () => {
+    const original = redirect('https://idp.example/login');
+
+    expect(await keepRedirectsToAppInside(fromIdp, original)).toBe(original);
+  });
+
+  it('leaves http redirects alone, they reach the app by themselves', async () => {
+    const original = redirect(callback);
+
+    expect(await keepRedirectsToAppInside(new Request('http://idp.example/authorize'), original)).toBe(original);
+  });
+
+  it('leaves other responses alone', async () => {
+    const original = new Response('ok');
+
+    expect(await keepRedirectsToAppInside(fromIdp, original)).toBe(original);
   });
 });

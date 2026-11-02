@@ -65,9 +65,46 @@ export function resolveAppFile(distDir, url) {
   return filePath;
 }
 
+const REDIRECT_STATUSES = new Set([301, 302, 303, 307, 308]);
+
+function escapeHtml(text) {
+  return text.replace(/[&<>"']/g, (char) => `&#${char.charCodeAt(0)};`);
+}
+
+// Chromium only runs a redirect through the protocol handlers when it stays
+// on the same scheme. An https IdP's redirect to the (http) app URL would go
+// to whatever really listens on localhost:8080 instead: nothing, so a blank
+// window, or another program, which would get the auth code. Such redirects
+// become a page that navigates to the app itself, and a new navigation does
+// go through the handlers. Other headers (Set-Cookie) are kept as they are.
+export async function keepRedirectsToAppInside(request, response) {
+  if (!REDIRECT_STATUSES.has(response.status)) return response;
+
+  const location = response.headers.get('location');
+  let target;
+  try {
+    target = new URL(location, request.url).href;
+  } catch {
+    return response;
+  }
+  if (!isAppUrl(target) || new URL(request.url).protocol === 'http:') return response;
+
+  const headers = new Headers(response.headers);
+  headers.delete('location');
+  headers.delete('content-length');
+  headers.set('Content-Type', 'text/html; charset=utf-8');
+  headers.set('Content-Security-Policy', "default-src 'none'");
+  headers.set('Cache-Control', 'no-store');
+  const body = `<!doctype html><meta http-equiv="refresh" content="0;url=${escapeHtml(target)}">`;
+  return new Response(body, { status: 200, headers });
+}
+
 // Answers app URLs from distDir inside the given session instead of opening a
-// real port. Every other http request is handed to `forward`.
+// real port. Every other http(s) request is handed to `forward`, which must
+// return redirects instead of following them; https is handled only so that
+// its redirects to the app can be caught (see keepRedirectsToAppInside).
 export function registerAppProtocol(ses, distDir, forward) {
+  ses.protocol.handle('https', async (request) => keepRedirectsToAppInside(request, await forward(request)));
   ses.protocol.handle('http', async (request) => {
     if (!isAppUrl(request.url)) return forward(request);
 

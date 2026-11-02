@@ -2,6 +2,7 @@ import { useEffect } from 'react';
 import { useAuth } from 'react-oidc-context';
 import './App.css';
 import { decodeJwt } from 'jose';
+import TokenBlock from './TokenBlock.jsx';
 
 function App() {
   const auth = useAuth();
@@ -73,11 +74,12 @@ function App() {
             </p>
             <p>ID token is available below:</p>
 
-            <pre className="pre-block">{auth.user?.id_token}</pre>
+            <TokenBlock title="ID token" token={auth.user?.id_token} />
           </>
         )}
 
         {decodedToken && <pre className="text-left">{JSON.stringify(decodedToken, null, 2)}</pre>}
+        {auth.user?.access_token && <TokenBlock title="Access token" token={auth.user.access_token} />}
         {auth.isAuthenticated && <button onClick={() => auth.signoutRedirect()}>Log Out</button>}
       </div>
     </>

@@ -1,4 +1,4 @@
-import { app, BrowserWindow, ipcMain, safeStorage, session, shell } from 'electron';
+import { app, BrowserWindow, ipcMain, Menu, safeStorage, session, shell } from 'electron';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { APP_URL, isAppUrl, registerAppProtocol } from './appServer.js';
@@ -14,6 +14,26 @@ function isWebUrl(url) {
   } catch {
     return false;
   }
+}
+
+// IdP pages load in the window itself, and one showing an error has no way
+// back to the app, so the menu always offers one.
+function createMenu() {
+  return Menu.buildFromTemplate([
+    {
+      label: '&Navigate',
+      submenu: [
+        { label: 'Back to App Home', accelerator: 'Alt+Home', click: (_item, win) => win?.loadURL(APP_URL) },
+        { label: 'Back', accelerator: 'Alt+Left', click: (_item, win) => win?.webContents.navigationHistory.goBack() },
+        { label: 'Forward', accelerator: 'Alt+Right', click: (_item, win) => win?.webContents.navigationHistory.goForward() },
+        { type: 'separator' },
+        { role: 'quit' },
+      ],
+    },
+    { role: 'editMenu' },
+    { role: 'viewMenu' },
+    { role: 'windowMenu' },
+  ]);
 }
 
 function createWindow(ses) {
@@ -48,8 +68,12 @@ app.whenReady().then(() => {
   // No `persist:` prefix: storage, cookies and cache live only in memory.
   const ses = session.fromPartition('oidc-test-client');
   registerAppProtocol(ses, distDir, (request) => forwardWithoutFollowingRedirects(ses, request));
-  ses.setPermissionRequestHandler((_webContents, _permission, callback) => callback(false));
-  ses.setPermissionCheckHandler(() => false);
+  // Only the app may write to the clipboard (the token copy buttons).
+  const isAllowed = (permission, url) => permission === 'clipboard-sanitized-write' && isAppUrl(url);
+  ses.setPermissionRequestHandler((_webContents, permission, callback, details) =>
+    callback(isAllowed(permission, details.requestingUrl)),
+  );
+  ses.setPermissionCheckHandler((_webContents, permission, requestingOrigin) => isAllowed(permission, requestingOrigin));
 
   const store = createSettingsStore({
     filePath: path.join(app.getPath('userData'), 'settings.json'),
@@ -70,6 +94,7 @@ app.whenReady().then(() => {
     return store.save(settings);
   });
 
+  Menu.setApplicationMenu(createMenu());
   createWindow(ses);
 });
 

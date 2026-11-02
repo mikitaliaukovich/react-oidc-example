@@ -23,6 +23,10 @@ http://localhost:8080/react-oidc-example/
 
 The desktop app doesn't open a network port. It serves itself at that address inside its own window only. The same URL is used by `npm run dev`.
 
+## Getting back to the app
+
+IdP pages open in the app window. If one shows an error or gets stuck, use **Navigate** → **Back to App Home** (`Alt+Home`) in the menu.
+
 ## Where data is kept
 
 - OIDC settings, including the client secret, are saved for the next launch in `settings.json` in the app's data folder. They are encrypted with Windows DPAPI, tied to your Windows account. If encryption isn't available, the client secret isn't saved.
@@ -42,6 +46,7 @@ To work on the UI in a browser instead, run `npm run dev` and open http://localh
 Other scripts:
 
 - `npm test`: unit tests (Vitest)
+- `npm run test:electron`: checks that IdP redirects reach the app (needs `openssl` on the PATH, which Git for Windows provides)
 - `npm run lint`: ESLint
 - `npm run dist`: build the portable `.exe` and `.zip` into `release/`
 
