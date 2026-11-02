@@ -11,7 +11,7 @@ function toHeaders(rawHeaders) {
   return headers;
 }
 
-// Sends a non-app http request (e.g. a plain-http IdP) to the network.
+// Sends a non-app http(s) request (e.g. to the IdP) to the network.
 //
 // Redirects are not followed here: they are handed back to Chromium, so the
 // next hop comes through the protocol handler again. Otherwise a redirect to

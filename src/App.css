@@ -40,3 +40,29 @@
 .read-the-docs {
   color: #888;
 }
+
+.token-block {
+  margin: 1.5em 0;
+  text-align: left;
+}
+
+.token-block-header {
+  display: flex;
+  align-items: center;
+  gap: 0.5em;
+}
+
+.token-block-header h3 {
+  margin: 0;
+}
+
+.icon-button {
+  display: inline-flex;
+  padding: 0.4em;
+}
+
+.token-value {
+  margin-top: 0.5em;
+  white-space: pre-wrap;
+  word-break: break-all;
+}

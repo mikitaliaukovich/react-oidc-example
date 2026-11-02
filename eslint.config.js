@@ -31,13 +31,13 @@ export default [
     },
   },
   {
-    files: ['electron/**/*.{js,cjs}'],
+    files: ['electron/**/*.{js,cjs}', 'scripts/**/*.cjs'],
     languageOptions: {
       globals: globals.node,
     },
   },
   {
-    files: ['electron/**/*.cjs'],
+    files: ['electron/**/*.cjs', 'scripts/**/*.cjs'],
     languageOptions: {
       sourceType: 'commonjs',
     },
